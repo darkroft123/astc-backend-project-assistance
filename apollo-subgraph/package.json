@@ -1,0 +1,16 @@
+{
+  "name": "smms-assistance-apollo-subgraph",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node src/index.js",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "@apollo/server": "^4.10.0",
+    "@apollo/subgraph": "^2.5.0",
+    "dotenv": "^16.6.1",
+    "graphql": "^16.8.1"
+  }
+}

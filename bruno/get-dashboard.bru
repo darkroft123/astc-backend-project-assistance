@@ -1,0 +1,41 @@
+meta {
+  name: GetDashboardPM
+}
+
+post {
+  url: {{base_url}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:graphql {
+  query: """
+  query GetDashboardPM(
+    $fromDate: String,
+    $toDate: String,
+    $projectId: UUID,
+    $userId: UUID
+  ) {
+    GetDashboardPM(
+      fromDate: $fromDate,
+      toDate: $toDate,
+      projectId: $projectId,
+      userId: $userId
+    ) {
+      totalMembers
+      presentCount
+      absentCount
+      lateCount
+    }
+  }
+  """
+}
+
+body:graphql:vars {
+  fromDate: null
+  toDate: null
+  projectId: null
+  userId: null
+}

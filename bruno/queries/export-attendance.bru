@@ -1,0 +1,23 @@
+meta {
+  name: ExportAttendance
+}
+
+post {
+  url: {{base_url}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:graphql {
+  query: "query ExportAttendance($projectId: String, $userId: String, $fromDate: String, $toDate: String, $status: String) { ExportAttendance(projectId: $projectId, userId: $userId, fromDate: $fromDate, toDate: $toDate, status: $status) { __typename } }"
+}
+
+body:graphql:vars {
+  projectId: null
+  userId: null
+  fromDate: null
+  toDate: null
+  status: null
+}

@@ -1,0 +1,116 @@
+version: "3.9"
+
+services:
+
+  project-assistance-service:
+    build: .
+    container_name: astc-cn-backend-project-assistance-service
+
+    ports:
+      - "8083:8082"
+
+    env_file:
+      - .env
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+
+    restart: unless-stopped
+    networks:
+      - astc-network
+
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: astc-cn-backend-project-assistance-db
+
+    environment:
+      POSTGRES_DB: astc_project_assistance
+      POSTGRES_USER: project_assistance_user
+      POSTGRES_PASSWORD: project_assistance_password   # ✅ FIX
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U project_assistance_user -d astc_project_assistance"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+    restart: unless-stopped
+    networks:
+      - astc-network
+
+
+  redis:
+    image: redis:7-alpine
+    container_name: astc-cn-backend-project-assistance-redis
+
+    ports:
+      - "6379:6379"
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+
+    restart: unless-stopped
+    networks:
+      - astc-network
+
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: astc-cn-backend-project-assistance-rabbitmq
+
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+    restart: unless-stopped
+    networks:
+      - astc-network
+
+
+  minio:
+    image: minio/minio:latest
+    container_name: astc-cn-backend-project-assistance-minio
+
+    command: server /data --console-address ":9001"
+
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+
+    volumes:
+      - miniodata:/data
+
+    restart: unless-stopped
+    networks:
+      - astc-network
+
+
+volumes:
+  pgdata:
+  miniodata:
+
+networks:
+  astc-network:
+    driver: bridge

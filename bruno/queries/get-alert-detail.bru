@@ -1,0 +1,19 @@
+meta {
+  name: GetAlertDetail
+}
+
+post {
+  url: {{base_url}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:graphql {
+  query: "query GetAlertDetail($id: String!) { GetAlertDetail(id: $id) { __typename } }"
+}
+
+body:graphql:vars {
+  id: "11111111-1111-1111-1111-111111111111"
+}

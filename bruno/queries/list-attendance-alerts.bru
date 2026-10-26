@@ -1,0 +1,24 @@
+meta {
+  name: ListAttendanceAlerts
+}
+
+post {
+  url: {{base_url}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:graphql {
+  query: "query ListAttendanceAlerts($page: Int!, $size: Int!, $status: String, $type: String, $fromDate: String, $toDate: String) { ListAttendanceAlerts(page: $page, size: $size, status: $status, type: $type, fromDate: $fromDate, toDate: $toDate) { __typename } }"
+}
+
+body:graphql:vars {
+  page: 0
+  size: 10
+  status: null
+  type: null
+  fromDate: null
+  toDate: null
+}

@@ -1,0 +1,22 @@
+meta {
+  name: GetDashboardPM
+}
+
+post {
+  url: {{base_url}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:graphql {
+  query: "query GetDashboardPM($fromDate: String, $toDate: String, $projectId: String, $userId: String) { GetDashboardPM(fromDate: $fromDate, toDate: $toDate, projectId: $projectId, userId: $userId) { __typename } }"
+}
+
+body:graphql:vars {
+  fromDate: null
+  toDate: null
+  projectId: null
+  userId: null
+}

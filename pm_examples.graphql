@@ -1,0 +1,161 @@
+# Ejemplos de Queries y Mutations para Project Manager
+
+query GetDashboardPM {
+  GetDashboardPM(
+    fromDate: "2023-01-01"
+    toDate: "2023-12-31"
+    projectId: "11111111-1111-1111-1111-111111111111"
+    userId: null
+  ) {
+    totalAttendances
+    totalAbsences
+    pendingJustifications
+  }
+}
+
+query ListTeamAttendance {
+  ListTeamAttendance(
+    page: 0
+    size: 20
+    projectId: "11111111-1111-1111-1111-111111111111"
+    userId: null
+    fromDate: "2023-01-01"
+    toDate: "2023-12-31"
+    status: "ON_TIME"
+  ) {
+    items {
+      id
+      userId
+      projectId
+      date
+      checkIn
+      checkOut
+      status
+    }
+    pageInfo {
+      totalItems
+      page
+      size
+      totalPages
+    }
+  }
+}
+
+query ExportAttendance {
+  ExportAttendance(
+    projectId: "11111111-1111-1111-1111-111111111111"
+    userId: null
+    fromDate: "2023-01-01"
+    toDate: "2023-12-31"
+    status: null
+  ) {
+    fileName
+    content
+  }
+}
+
+
+query ListAttendanceAlerts {
+  ListAttendanceAlerts(
+    page: 0
+    size: 10
+    status: "PENDING"
+    type: "LATE"
+    fromDate: "2023-01-01"
+    toDate: "2023-12-31"
+  ) {
+    items {
+      id
+      type
+      status
+      detail
+    }
+  }
+}
+
+query GetAlertDetail {
+  GetAlertDetail(id: "22222222-2222-2222-2222-222222222222") {
+    id
+    type
+    status
+    detail
+    latitude
+    longitude
+    createdAt
+  }
+}
+
+mutation ApproveAlert {
+  ApproveAlert(alertId: "22222222-2222-2222-2222-222222222222") {
+    id
+    status
+  }
+}
+
+mutation CancelAlert {
+  CancelAlert(alertId: "22222222-2222-2222-2222-222222222222") {
+    id
+    status
+  }
+}
+
+query ListJustifications {
+  ListJustifications(
+    page: 0
+    size: 10
+    userId: null
+    status: "PENDING"
+    fromDate: "2023-01-01"
+    toDate: "2023-12-31"
+  ) {
+    items {
+      id
+      absenceId
+      userId
+      description
+      documentUrl
+      status
+      comment
+      submittedAt
+      reviewedAt
+    }
+  }
+}
+
+query GetJustificationDetail {
+  GetJustificationDetail(id: "33333333-3333-3333-3333-333333333333") {
+    id
+    absenceId
+    userId
+    description
+    documentUrl
+    status
+    comment
+    submittedAt
+    reviewedAt
+  }
+}
+
+mutation ApproveJustification {
+  ApproveJustification(
+    justificationId: "33333333-3333-3333-3333-333333333333"
+    comment: "This absence is fully justified due to medical reasons."
+  ) {
+    id
+    status
+    comment
+    reviewedAt
+  }
+}
+
+mutation RejectJustification {
+  RejectJustification(
+    justificationId: "33333333-3333-3333-3333-333333333333"
+    comment: "Insufficient proof."
+  ) {
+    id
+    status
+    comment
+    reviewedAt
+  }
+}

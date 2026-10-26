@@ -1,0 +1,25 @@
+meta {
+  name: ListTeamAttendance
+}
+
+post {
+  url: {{base_url}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:graphql {
+  query: "query ListTeamAttendance($page: Int!, $size: Int!, $projectId: String, $userId: String, $fromDate: String, $toDate: String, $status: String) { ListTeamAttendance(page: $page, size: $size, projectId: $projectId, userId: $userId, fromDate: $fromDate, toDate: $toDate, status: $status) { __typename } }"
+}
+
+body:graphql:vars {
+  page: 0
+  size: 10
+  projectId: null
+  userId: null
+  fromDate: null
+  toDate: null
+  status: null
+}

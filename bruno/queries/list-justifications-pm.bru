@@ -1,0 +1,24 @@
+meta {
+  name: ListJustificationsPM
+}
+
+post {
+  url: {{base_url}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:graphql {
+  query: "query ListJustificationsPM($page: Int!, $size: Int!, $userId: String, $status: String, $fromDate: String, $toDate: String) { ListJustificationsPM(page: $page, size: $size, userId: $userId, status: $status, fromDate: $fromDate, toDate: $toDate) { __typename } }"
+}
+
+body:graphql:vars {
+  page: 0
+  size: 10
+  userId: null
+  status: null
+  fromDate: null
+  toDate: null
+}

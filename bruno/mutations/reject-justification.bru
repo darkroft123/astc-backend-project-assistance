@@ -1,0 +1,20 @@
+meta {
+  name: RejectJustification
+}
+
+post {
+  url: {{base_url}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:graphql {
+  query: "mutation RejectJustification($justificationId: String!, $comment: String!) { RejectJustification(justificationId: $justificationId, comment: $comment) { __typename } }"
+}
+
+body:graphql:vars {
+  justificationId: "11111111-1111-1111-1111-111111111111"
+  comment: "Rejected from Bruno"
+}

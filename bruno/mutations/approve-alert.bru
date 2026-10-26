@@ -1,0 +1,19 @@
+meta {
+  name: ApproveAlert
+}
+
+post {
+  url: {{base_url}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:graphql {
+  query: "mutation ApproveAlert($alertId: String!) { ApproveAlert(alertId: $alertId) { __typename } }"
+}
+
+body:graphql:vars {
+  alertId: "11111111-1111-1111-1111-111111111111"
+}

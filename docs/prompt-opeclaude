@@ -1,0 +1,72 @@
+You are a software analyst.
+
+Generate functional specifications in Spanish for ALL the following GraphQL operations:
+
+GetDashboard
+ListAttendance
+ListAbsences
+ListJustifications
+GetJustificationStatus
+RegisterAttendance
+JustifyAbsence
+SaveJustification
+
+For EACH operation use EXACTLY this structure:
+
+## OperationName
+
+### Descripción
+
+Write a clear description of what the operation does.
+
+### Pantalla / Módulo
+
+Indicate where it is used in the system.
+
+### Rol de usuario
+
+Team Member
+
+### Inputs
+
+List all inputs with type and description.
+
+### Campos de respuesta
+
+List all response fields with type and description.
+
+### Reglas de negocio
+
+Write relevant business rules.
+
+### Estado vacío
+
+Explain behavior when there is no data.
+
+### Manejo de errores
+
+List possible errors.
+
+### Notas para frontend
+
+Explain how frontend should use it.
+
+### Request
+
+Write a valid GraphQL request example.
+
+### Response
+
+Write a valid JSON response example.
+
+IMPORTANT RULES:
+
+* Do NOT remove sections
+* Do NOT change order
+* Do NOT use placeholders like "..."
+* Use realistic values (UUIDs, dates, etc.)
+* Keep it concise but complete
+* Output ONLY Markdown
+* Separate each operation clearly
+
+Generate all specifications now.
