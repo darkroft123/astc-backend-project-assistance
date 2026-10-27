@@ -27,28 +27,36 @@ public class TeamMembershipResolver {
             if (projectId != null) {
                 if (isAdmin) return List.of(userId);
                 boolean isMember = ProjectMember.count("projectId = ?1 and userId = ?2", projectId, userId) > 0;
-                return isMember ? List.of(userId) : List.of();
+                return (isMember || userId.equals(currentPmId)) ? List.of(userId) : List.of();
             } else {
                 if (isAdmin) return List.of(userId);
                 List<UUID> pmProjectIds = projectIdsOf(currentPmId);
-                if (pmProjectIds.isEmpty()) return List.of();
+                if (pmProjectIds.isEmpty()) return userId.equals(currentPmId) ? List.of(userId) : List.of();
                 boolean isMemberOfAny = ProjectMember.count("projectId in ?1 and userId = ?2", pmProjectIds, userId) > 0;
-                return isMemberOfAny ? List.of(userId) : List.of();
+                return (isMemberOfAny || userId.equals(currentPmId)) ? List.of(userId) : List.of();
             }
         } else {
             if (projectId != null) {
                 List<ProjectMember> members = ProjectMember.list("projectId = ?1", projectId);
-                return members.stream().map(m -> m.userId).collect(Collectors.toList());
+                List<UUID> memberIds = members.stream().map(m -> m.userId).distinct().collect(Collectors.toList());
+                if (currentPmId != null && !memberIds.contains(currentPmId)) {
+                    memberIds = new java.util.ArrayList<>(memberIds);
+                    memberIds.add(currentPmId);
+                }
+                return memberIds;
             } else {
                 if (isAdmin) {
-                    List<ProjectMember> allMembers = ProjectMember.listAll();
-                    List<UUID> allMemberIds = allMembers.stream().map(m -> m.userId).distinct().collect(Collectors.toList());
-                    return allMemberIds;
+                    return null;
                 }
                 List<UUID> pmProjectIds = projectIdsOf(currentPmId);
-                if (pmProjectIds.isEmpty()) return List.of();
+                if (pmProjectIds.isEmpty()) return currentPmId != null ? List.of(currentPmId) : List.of();
                 List<ProjectMember> allMembers = ProjectMember.list("projectId in ?1", pmProjectIds);
-                return allMembers.stream().map(m -> m.userId).distinct().collect(Collectors.toList());
+                List<UUID> allMemberIds = allMembers.stream().map(m -> m.userId).distinct().collect(Collectors.toList());
+                if (currentPmId != null && !allMemberIds.contains(currentPmId)) {
+                    allMemberIds = new java.util.ArrayList<>(allMemberIds);
+                    allMemberIds.add(currentPmId);
+                }
+                return allMemberIds;
             }
         }
     }
