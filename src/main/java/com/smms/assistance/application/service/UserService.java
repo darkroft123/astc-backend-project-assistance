@@ -68,21 +68,31 @@ public class UserService {
         return listUsers(null);
     }
 
+    private static volatile List<UserOutput> cachedUsersList = null;
+    private static volatile long lastUsersFetchTime = 0;
+    private static final long USERS_CACHE_TTL_MS = 60_000;
+
     public List<UserOutput> listUsers(String token) {
+        long now = System.currentTimeMillis();
+        if (cachedUsersList != null && (now - lastUsersFetchTime < USERS_CACHE_TTL_MS)) {
+            return cachedUsersList;
+        }
         long start = System.currentTimeMillis();
         LOG.info("📡 [HTTP] Fetching ALL users from backoffice-service");
         try {
             ErrorOr<List<UserOutput>> response = getBackofficeClient(token).listUsers();
             if (response == null || response.hasErrors() || !response.isPresent()) {
                 LOG.warn("⚠️ [HTTP] GraphQL errors or missing data fetching users: " + (response != null ? response.getErrors() : "null"));
-                return List.of();
+                return cachedUsersList != null ? cachedUsersList : List.of();
             }
             long elapsed = System.currentTimeMillis() - start;
             LOG.info("✅ [HTTP] Users list fetched: " + response.get().size() + " users in " + elapsed + "ms");
-            return response.get();
+            cachedUsersList = response.get();
+            lastUsersFetchTime = System.currentTimeMillis();
+            return cachedUsersList;
         } catch (Exception ex) {
             LOG.warn("⚠️ [HTTP] Non-fatal exception fetching users: " + ex.getMessage());
-            return List.of();
+            return cachedUsersList != null ? cachedUsersList : List.of();
         }
     }
 

@@ -480,13 +480,20 @@ public class ProjectManagerQueryResolver {
         // Project Manager sees only assigned projects
         UUID userId = authContext.getUserId();
         List<ProjectMember> memberships = ProjectMember.list("userId = ?1", userId);
-        List<UUID> projectIds = memberships.stream()
+        java.util.Set<UUID> projectIds = memberships.stream()
                 .map(m -> m.projectId)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
 
-        if (projectIds.isEmpty()) return List.of();
+        List<Project> projectsByMember = projectIds.isEmpty() ? List.of() : Project.list("id in ?1 and deletedAt is null", projectIds);
+        List<Project> projectsByResponsible = Project.list("responsibleId = ?1 and deletedAt is null", userId);
 
-        List<Project> projects = Project.list("id in ?1 and deletedAt is null", projectIds);
+        java.util.Map<UUID, Project> projectMap = new java.util.HashMap<>();
+        for (Project p : projectsByMember) projectMap.put(p.id, p);
+        for (Project p : projectsByResponsible) projectMap.put(p.id, p);
+
+        List<Project> projects = new java.util.ArrayList<>(projectMap.values());
+        if (projects.isEmpty()) return List.of();
+
         return enrichProjectsBatch(projects, userId);
     }
 
