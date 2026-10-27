@@ -34,9 +34,9 @@ public class GetDashboardPMUseCase implements GetDashboardPMPort {
         System.out.println("[PM Attendance] Project Assistance -> Assistance client call");
         System.out.println("  Query name: GetDashboardPMInternal");
         System.out.println("  Project ID: " + projectId);
-        System.out.println("  Number of project members resolved: " + userIds.size());
+        System.out.println("  Number of project members resolved: " + (userIds != null ? userIds.size() : "ALL"));
 
-        if (userIds.isEmpty()) {
+        if (userIds != null && userIds.isEmpty()) {
             return DashboardSummary.builder()
                     .totalAttendances(0)
                     .totalAbsences(0)

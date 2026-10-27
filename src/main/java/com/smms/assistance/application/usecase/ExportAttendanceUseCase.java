@@ -41,7 +41,7 @@ public class ExportAttendanceUseCase implements ExportAttendancePort {
 
         System.out.println("[PM Attendance] Exporting attendance for PM: " + currentPmId);
 
-        if (userIds.isEmpty()) {
+        if (userIds != null && userIds.isEmpty()) {
             return ExportResultOutput.builder()
                     .fileName("asistencias_" + LocalDate.now() + ".csv")
                     .content("\uFEFFID;Colaborador;Email;Proyecto;Fecha;Hora Entrada;Hora Salida;Estado;Ubicación\n")

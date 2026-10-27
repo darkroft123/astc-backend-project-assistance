@@ -38,14 +38,14 @@ public class ListTeamAttendanceUseCase implements ListTeamAttendancePort {
         // 1. Resolve project members
         List<UUID> userIds = teamMembershipResolver.resolve(projectId, userId, currentPmId);
 
-        System.out.println("  Number of project members resolved: " + userIds.size());
+        System.out.println("  Number of project members resolved: " + (userIds != null ? userIds.size() : "ALL"));
 
         System.out.println("[PM Attendance] Attendance history loading");
         System.out.println("  Selected project: " + projectId);
         System.out.println("  Resolved member IDs: " + userIds);
         System.out.println("  Pagination parameters: page=" + page + ", size=" + size);
 
-        if (userIds.isEmpty()) {
+        if (userIds != null && userIds.isEmpty()) {
             System.out.println("[PM Attendance] Records returned: 0 (No members resolved)");
             return Page.<AttendanceEntity>builder()
                     .items(List.of())
