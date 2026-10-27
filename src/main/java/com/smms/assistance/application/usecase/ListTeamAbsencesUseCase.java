@@ -44,7 +44,7 @@ public class ListTeamAbsencesUseCase implements ListTeamAbsencesPort {
                     .build();
         }
 
-        StringBuilder query = new StringBuilder("userId in :userIds");
+        StringBuilder query = new StringBuilder("userId in (:userIds)");
         Map<String, Object> params = new HashMap<>();
         params.put("userIds", userIds);
 

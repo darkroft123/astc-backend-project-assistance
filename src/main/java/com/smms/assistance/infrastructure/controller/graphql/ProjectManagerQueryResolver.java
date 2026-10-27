@@ -930,7 +930,7 @@ public class ProjectManagerQueryResolver {
                 if (allowedProjectIds.isEmpty()) {
                     return java.util.Collections.emptyList();
                 }
-                query.append(" and projectId IN :projectIds");
+                query.append(" and projectId in (:projectIds)");
                 params.put("projectIds", allowedProjectIds);
             }
         }

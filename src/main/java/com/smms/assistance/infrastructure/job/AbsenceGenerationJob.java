@@ -135,14 +135,14 @@ public class AbsenceGenerationJob {
 
             if (!memberIds.isEmpty()) {
                 usersWithAttendance.addAll(entityManager.createQuery(
-                        "SELECT a.userId FROM AttendanceEntity a WHERE a.projectId = :projectId AND a.date = :today AND a.status NOT IN ('OUTSIDE_SCHEDULE', 'EARLY') AND a.userId IN :userIds", UUID.class)
+                        "SELECT a.userId FROM AttendanceEntity a WHERE a.projectId = :projectId AND a.date = :today AND a.status NOT IN ('OUTSIDE_SCHEDULE', 'EARLY') AND a.userId in (:userIds)", UUID.class)
                         .setParameter("projectId", project.id)
                         .setParameter("today", today)
                         .setParameter("userIds", memberIds)
                         .getResultList());
 
                 usersWithAbsence.addAll(entityManager.createQuery(
-                        "SELECT a.userId FROM AbsenceEntity a WHERE a.projectId = :projectId AND a.date = :today AND a.userId IN :userIds", UUID.class)
+                        "SELECT a.userId FROM AbsenceEntity a WHERE a.projectId = :projectId AND a.date = :today AND a.userId in (:userIds)", UUID.class)
                         .setParameter("projectId", project.id)
                         .setParameter("today", today)
                         .setParameter("userIds", memberIds)
