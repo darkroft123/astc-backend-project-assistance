@@ -35,6 +35,9 @@ public class OutboxEventProcessor {
     AuthClient authClient;
 
     @Inject
+    com.smms.assistance.application.in.ProjectPort projectPort;
+
+    @Inject
     @Channel("notification-events")
     Emitter<String> notificationEmitter;
 
@@ -115,6 +118,50 @@ public class OutboxEventProcessor {
 
                     if (toEmail == null || toEmail.isBlank()) {
                         toEmail = "dev-notification@astc.local";
+                    }
+
+                    // Enriquecer nombre de proyecto
+                    String projectIdStr = payload.getString("projectId");
+                    if (projectIdStr != null && !projectIdStr.isBlank()) {
+                        try {
+                            UUID pid = UUID.fromString(projectIdStr);
+                            projectPort.findById(pid).ifPresent(p -> {
+                                if (p.name != null && !p.name.isBlank()) {
+                                    payload.put("PROJECT_NAME", p.name);
+                                    payload.put("projectName", p.name);
+                                }
+                            });
+                        } catch (Exception e) {
+                            LOG.warnf("Could not resolve project name for projectId=%s", projectIdStr);
+                        }
+                    }
+
+                    // Enriquecer y traducir roles
+                    String rawRole = null;
+                    if (payload.containsKey("role")) rawRole = payload.getString("role");
+                    else if (payload.containsKey("newRole")) rawRole = payload.getString("newRole");
+                    else if (payload.containsKey("memberRole")) rawRole = payload.getString("memberRole");
+
+                    if (rawRole != null && !rawRole.isBlank()) {
+                        String transRole = translateRole(rawRole);
+                        payload.put("ROLE_NAME", transRole);
+                        payload.put("role", transRole);
+                        payload.put("roleName", transRole);
+                        payload.put("NEW_USER_ROLE", transRole);
+                    } else if (templateCode.equals("ASB000005") || templateCode.equals("ASB000007")) {
+                        payload.put("ROLE_NAME", "Miembro del Equipo");
+                    }
+
+                    if (payload.containsKey("previousRole")) {
+                        payload.put("previousRole", translateRole(payload.getString("previousRole")));
+                    }
+
+                    // Enriquecer y traducir estados / alertas
+                    if (payload.containsKey("status")) {
+                        payload.put("STATUS", translateStatus(payload.getString("status")));
+                    }
+                    if (payload.containsKey("type")) {
+                        payload.put("ALERT_TYPE", translateStatus(payload.getString("type")));
                     }
 
                     JsonObject msg = new JsonObject();
@@ -241,6 +288,38 @@ public class OutboxEventProcessor {
                 return "ASP000027";
             default:
                 return null;
+        }
+    }
+
+    private static String translateRole(String role) {
+        if (role == null || role.isBlank()) return "Miembro del Equipo";
+        switch (role.trim().toUpperCase()) {
+            case "SUPER_ADMIN": return "Super Administrador";
+            case "ADMIN": return "Administrador";
+            case "PROJECT_MANAGER": return "Jefe de Proyecto";
+            case "LEAD": return "Líder Técnico";
+            case "DEVELOPER": return "Desarrollador";
+            case "TEAM_MEMBER": return "Miembro del Equipo";
+            case "MEMBER": return "Miembro";
+            default: return role;
+        }
+    }
+
+    private static String translateStatus(String val) {
+        if (val == null || val.isBlank()) return val;
+        switch (val.trim().toUpperCase()) {
+            case "NO_PHOTO": return "Sin fotografía";
+            case "LOCATION_MISMATCH": return "Ubicación fuera de rango";
+            case "FACE_MISMATCH": return "Rostro no coincide";
+            case "UNKNOWN_DEVICE": return "Dispositivo no reconocido";
+            case "PENDING": return "Pendiente";
+            case "APPROVED": return "Aprobada";
+            case "REJECTED": return "Rechazada";
+            case "CANCELLED": return "Cancelada";
+            case "OBSERVED": return "Observada";
+            case "OBSERVATION": return "Observada";
+            case "REQUESTED": return "Solicitadas";
+            default: return val;
         }
     }
 }
