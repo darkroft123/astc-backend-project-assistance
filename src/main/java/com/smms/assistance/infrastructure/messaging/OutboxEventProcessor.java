@@ -157,11 +157,15 @@ public class OutboxEventProcessor {
                     }
 
                     // Enriquecer y traducir estados / alertas
-                    if (payload.containsKey("status")) {
+                    if (payload.containsKey("status") && payload.getString("status") != null) {
                         payload.put("STATUS", translateStatus(payload.getString("status")));
+                    } else if (!payload.containsKey("STATUS") || payload.getString("STATUS") == null || payload.getString("STATUS").isBlank()) {
+                        payload.put("STATUS", "Pendiente");
                     }
-                    if (payload.containsKey("type")) {
+                    if (payload.containsKey("type") && payload.getString("type") != null) {
                         payload.put("ALERT_TYPE", translateStatus(payload.getString("type")));
+                    } else if (!payload.containsKey("ALERT_TYPE") || payload.getString("ALERT_TYPE") == null || payload.getString("ALERT_TYPE").isBlank()) {
+                        payload.put("ALERT_TYPE", "Alerta general");
                     }
 
                     JsonObject msg = new JsonObject();

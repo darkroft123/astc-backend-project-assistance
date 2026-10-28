@@ -44,7 +44,7 @@ public class ExportAttendanceUseCase implements ExportAttendancePort {
         if (userIds != null && userIds.isEmpty()) {
             return ExportResultOutput.builder()
                     .fileName("asistencias_" + LocalDate.now() + ".csv")
-                    .content("\uFEFFsep=;\r\nID;Colaborador;Email;Proyecto;Fecha;Hora Entrada;Hora Salida;Estado;Ubicación\n")
+                    .content("\uFEFFsep=;\r\nID;Colaborador;Rol;Email;Proyecto;Fecha;Hora Entrada;Hora Salida;Estado;Ubicación\n")
                     .build();
         }
 
@@ -85,7 +85,7 @@ public class ExportAttendanceUseCase implements ExportAttendancePort {
         StringBuilder csv = new StringBuilder();
         csv.append("\uFEFF"); // UTF-8 BOM for Excel to detect encoding and cells
         csv.append("sep=;\r\n");
-        csv.append("ID;Colaborador;Email;Proyecto;Fecha;Hora Entrada;Hora Salida;Estado;Ubicación\r\n");
+        csv.append("ID;Colaborador;Rol;Email;Proyecto;Fecha;Hora Entrada;Hora Salida;Estado;Ubicación\r\n");
 
         if (clientResponse != null && clientResponse.getItems() != null) {
             for (var a : clientResponse.getItems()) {
@@ -116,9 +116,20 @@ public class ExportAttendanceUseCase implements ExportAttendancePort {
 
                 String location = resolveDistrict(a.getLatitude(), a.getLongitude());
 
-                csv.append(String.format("%s;%s;%s;%s;%s;%s;%s;%s;%s\r\n",
+                String role = "Colaborador";
+                if (userObj != null) {
+                    String r = userObj.roleName != null && !userObj.roleName.isBlank()
+                            ? userObj.roleName
+                            : userObj.roleCode;
+                    if (r != null && !r.isBlank()) {
+                        role = translateRole(r);
+                    }
+                }
+
+                csv.append(String.format("%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\r\n",
                         escapeCsv(a.getId() != null ? a.getId().toString() : ""),
                         escapeCsv(colabName),
+                        escapeCsv(role),
                         escapeCsv(email),
                         escapeCsv(projectName),
                         escapeCsv(a.getDate() != null ? a.getDate().toString() : ""),
@@ -171,10 +182,14 @@ public class ExportAttendanceUseCase implements ExportAttendancePort {
                 com.fasterxml.jackson.databind.JsonNode addr = root.path("address");
 
                 if (!addr.isMissingNode()) {
-                    String district = getFirstText(addr, "city_district", "suburb", "neighbourhood", "quarter", "town", "village", "city", "county", "state");
+                    String district = getFirstText(addr, "city", "town", "city_district", "suburb", "municipality", "county");
+                    String state = getFirstText(addr, "state", "region");
                     if (district != null && !district.isBlank()) {
-                        districtCache.put(key, district.trim());
-                        return district.trim();
+                        String res = (state != null && !state.isBlank() && !district.equalsIgnoreCase(state))
+                                ? (district.trim() + ", " + state.trim())
+                                : district.trim();
+                        districtCache.put(key, res);
+                        return res;
                     }
                 }
             }
@@ -197,6 +212,28 @@ public class ExportAttendanceUseCase implements ExportAttendancePort {
         return null;
     }
 
+    private String translateRole(String role) {
+        if (role == null || role.isBlank()) return "Colaborador";
+        switch (role.trim().toUpperCase()) {
+            case "SUPER_ADMIN":
+            case "ADMIN":
+            case "ADMINISTRATOR":
+                return "Admin";
+            case "PROJECT_MANAGER":
+            case "PROJECT MANAGER":
+            case "MANAGER":
+            case "LEAD":
+                return "Jefe de Proyecto";
+            case "TEAM_MEMBER":
+            case "TEAM MEMBER":
+            case "DEVELOPER":
+            case "MEMBER":
+            case "USER":
+            default:
+                return "Colaborador";
+        }
+    }
+
     private String formatTime(String timeStr) {
         if (timeStr == null || timeStr.isBlank() || "null".equalsIgnoreCase(timeStr)) {
             return "--:--";
@@ -207,6 +244,10 @@ public class ExportAttendanceUseCase implements ExportAttendancePort {
         }
         if (formatted.contains(".")) {
             formatted = formatted.substring(0, formatted.indexOf("."));
+        }
+        String[] parts = formatted.split(":");
+        if (parts.length >= 2) {
+            return parts[0] + ":" + parts[1];
         }
         return formatted;
     }

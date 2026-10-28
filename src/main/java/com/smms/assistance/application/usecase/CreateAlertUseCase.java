@@ -49,7 +49,7 @@ public class CreateAlertUseCase {
         outboxPublisher.publish("ALERT", alert.getId(), "ALERT_CREATED",
                 "{\"alertId\":\"" + alert.getId() + "\",\"userId\":\"" + userId
                 + "\",\"projectId\":\"" + projectId + "\",\"recipientUserId\":\"" + recipientId
-                + "\",\"type\":\"" + escape(type) + "\"}");
+                + "\",\"type\":\"" + escape(type) + "\",\"status\":\"" + alert.getStatus() + "\"}");
 
         return alert;
     }
