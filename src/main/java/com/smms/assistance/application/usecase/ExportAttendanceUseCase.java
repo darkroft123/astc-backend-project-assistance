@@ -44,7 +44,7 @@ public class ExportAttendanceUseCase implements ExportAttendancePort {
         if (userIds != null && userIds.isEmpty()) {
             return ExportResultOutput.builder()
                     .fileName("asistencias_" + LocalDate.now() + ".csv")
-                    .content("\uFEFFsep=;\r\nID;Colaborador;Rol;Email;Proyecto;Fecha;Hora Entrada;Hora Salida;Estado;Ubicación\n")
+                    .content("\uFEFFID;Colaborador;Rol;Email;Proyecto;Fecha;Hora Entrada;Hora Salida;Estado;Ubicación\r\n")
                     .build();
         }
 
@@ -84,7 +84,6 @@ public class ExportAttendanceUseCase implements ExportAttendancePort {
 
         StringBuilder csv = new StringBuilder();
         csv.append("\uFEFF"); // UTF-8 BOM for Excel to detect encoding and cells
-        csv.append("sep=;\r\n");
         csv.append("ID;Colaborador;Rol;Email;Proyecto;Fecha;Hora Entrada;Hora Salida;Estado;Ubicación\r\n");
 
         if (clientResponse != null && clientResponse.getItems() != null) {
